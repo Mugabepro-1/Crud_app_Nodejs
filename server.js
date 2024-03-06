@@ -1,7 +1,10 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const Product = require('./models/productModel')
+const asyncHandler = require('async-handler')
+const mongodb = require('mongodb')
 const app  = express()
+
 
 //To allow our app know reading json files
 app.use(express.json())
@@ -9,7 +12,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 
 //creating routes
-app.get('/',(req, res) =>{
+app.get('/', (req, res) =>{
     res.send("HELLO NODE APIS")
 });
 
@@ -63,9 +66,9 @@ app.listen(3000, ()=>{
 })
 
 //Update the data in the database
-app.put('/products', async(req, res)=>{
+app.put('/products/:id', async(req, res)=>{
     try {
-        const {id} = req.params;
+        const {id} = req.params
         const product = await Product.findByIdAndUpdate(id,req.body)
         if(!Product){
            return res.status(404).json({message:`can not find product with id ${id}`})
@@ -91,13 +94,13 @@ app.delete('/products/:id', async(req, res) =>{
     } catch (error) {
         res.status(500).json({message:error.message})
     }
-
 })
 
 
 mongoose.set("strictQuery", false)
+//Connect to the database
 mongoose
-.connect('mongodb+srv://admin:12345678promesse@firstclu.foa4nut.mongodb.net/Node API?retryWrites=true&w=majority&appName=Firstclu')
+.connect("mongodb+srv://admin:12345678promesse@firstclu.foa4nut.mongodb.net/?retryWrites=true&w=majority&appName=Firstclu")
 .then(()=>{
     console.log("Connected to the database")
 }).catch((error)=>{
